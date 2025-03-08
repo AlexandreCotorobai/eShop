@@ -1,0 +1,24 @@
+﻿receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
+  # prometheus:
+  #   config:
+  #     scrape_configs:
+  #       - job_name: 'basket-api'
+  #         scrape_interval: 5s
+  #         static_configs:
+  #           - targets: ['host.docker.internal:5221']
+
+exporters:
+  prometheus:
+    endpoint: "0.0.0.0:9464"
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      exporters: [prometheus]
