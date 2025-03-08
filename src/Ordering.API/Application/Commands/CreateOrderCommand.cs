@@ -1,4 +1,10 @@
-﻿namespace eShop.Ordering.API.Application.Commands;
+﻿
+﻿using System.Diagnostics.Metrics;
+using Microsoft.Extensions.Logging;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace eShop.Ordering.API.Application.Commands;
 
 // DDD and CQRS patterns comment: Note that it is recommended to implement immutable Commands
 // In this case, its immutability is achieved by having all the setters as private
