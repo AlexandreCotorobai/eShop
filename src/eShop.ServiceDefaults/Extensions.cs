@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
-using OpenTelemetry.Exporter.Prometheus;
 
 namespace eShop.ServiceDefaults;
 
@@ -62,7 +61,7 @@ public static partial class Extensions
                 metrics.AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddRuntimeInstrumentation()
-                    .AddMeter("Experimental.Microsoft.Extensions.AI").AddPrometheusExporter(); // ADICIONA O EXPORTADOR PARA PROMETHEUS;
+                    .AddMeter("Experimental.Microsoft.Extensions.AI");
             })
             .WithTracing(tracing =>
             {
@@ -85,12 +84,6 @@ public static partial class Extensions
 
     private static IHostApplicationBuilder AddOpenTelemetryExporters(this IHostApplicationBuilder builder)
     {
-
-        builder.Services.ConfigureOpenTelemetryMeterProvider(metrics =>
-        {
-            metrics.AddPrometheusExporter(); // GARANTE QUE O PROMETHEUS ESTÁ REGISTRADO
-        });
-        
         var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
 
         if (useOtlpExporter)
@@ -115,7 +108,7 @@ public static partial class Extensions
     public static WebApplication MapDefaultEndpoints(this WebApplication app)
     {
         // Uncomment the following line to enable the Prometheus endpoint (requires the OpenTelemetry.Exporter.Prometheus.AspNetCore package)
-        app.MapPrometheusScrapingEndpoint();
+        // app.MapPrometheusScrapingEndpoint();
 
         // Adding health checks endpoints to applications in non-development environments has security implications.
         // See https://aka.ms/dotnet/aspire/healthchecks for details before enabling these endpoints in non-development environments.
