@@ -1,9 +1,52 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿﻿using Microsoft.AspNetCore.Http.HttpResults;
+using System.Diagnostics;
 using CardType = eShop.Ordering.API.Application.Queries.CardType;
 using Order = eShop.Ordering.API.Application.Queries.Order;
-
+using eShop.Ordering.API.OpenTelemetry;
+using System.Diagnostics.Metrics;
 public static class OrdersApi
 {
+    // Create a dedicated ActivitySource and Meter for this class
+    private static readonly ActivitySource ActivitySource = new("eShop.Ordering", "1.0.0");
+    private static readonly Meter Meter = new("eShop.Ordering", "1.0.0");
+    
+    // Helpers to mask sensitive data
+    private static string MaskUserId(string userId)
+    {
+        if (string.IsNullOrEmpty(userId))
+            return userId;
+
+        // If it's a UUID/GUID format, keep first and last components
+        if (Guid.TryParse(userId, out _))
+        {
+            var parts = userId.Split('-');
+            if (parts.Length >= 5)
+            {
+                return $"{parts[0]}-****-****-****-{parts[4]}";
+            }
+        }
+
+        // If it's an email, mask the local part except first character
+        if (userId.Contains('@'))
+        {
+            var parts = userId.Split('@');
+            if (parts.Length == 2 && !string.IsNullOrEmpty(parts[0]))
+            {
+                return $"{parts[0][0]}***@{parts[1]}";
+            }
+        }
+
+        // For other formats, mask the middle portion
+        if (userId.Length > 6)
+        {
+            int visibleChars = Math.Max(2, userId.Length / 4);
+            return $"{userId.Substring(0, visibleChars)}****{userId.Substring(userId.Length - visibleChars)}";
+        }
+
+        // For short IDs, just return a generic mask
+        return "****";
+    }
+
     public static RouteGroupBuilder MapOrdersApiV1(this IEndpointRouteBuilder app)
     {
         var api = app.MapGroup("api/orders").HasApiVersion(1.0);
@@ -29,6 +72,11 @@ public static class OrdersApi
             return TypedResults.BadRequest("Empty GUID is not valid for request ID");
         }
 
+        // Create a child activity for order cancellation
+        using var activity = ActivitySource.StartActivity("CancelOrder");
+        activity?.SetTag("order.number", command.OrderNumber);
+        activity?.SetTag("request.id", requestId.ToString());
+
         var requestCancelOrder = new IdentifiedCommand<CancelOrderCommand, bool>(command, requestId);
 
         services.Logger.LogInformation(
@@ -42,9 +90,11 @@ public static class OrdersApi
 
         if (!commandResult)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, "Cancel order failed to process");
             return TypedResults.Problem(detail: "Cancel order failed to process.", statusCode: 500);
         }
 
+        activity?.SetStatus(ActivityStatusCode.Ok);
         return TypedResults.Ok();
     }
 

@@ -1,6 +1,6 @@
 ﻿﻿using System.Diagnostics.Metrics;
 using OpenTelemetry.Metrics;
-﻿using OpenTelemetry.Trace;
+using OpenTelemetry.Trace;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Instrumentation.Http;
@@ -27,7 +27,7 @@ builder.Services.AddSingleton(meter);
 builder.Services.AddSingleton(meter.CreateCounter<long>("order_placed_count", description: "Número total de orders."));
 
 builder.Services.AddOpenTelemetry()
-.WithTracing(tracerProviderBuilder =>
+    .WithTracing(tracerProviderBuilder =>
     {
         tracerProviderBuilder
             .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("OrderAPI"))
