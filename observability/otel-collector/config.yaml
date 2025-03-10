@@ -1,0 +1,57 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 65
+    spike_limit_percentage: 20
+
+  batch:
+
+  transform:
+    trace_statements:
+      - context: span
+        statements:
+          # Delete sensitive fields
+          - delete_key(attributes, "password")
+          - delete_key(attributes, "credit_card")
+          - delete_key(attributes, "card.number")
+          # Redact PII
+          - set(attributes["user.email"], "[REDACTED]") where attributes["user.email"] != nil
+          - set(attributes["user.name"], "[REDACTED]") where attributes["user.name"] != nil
+          - set(attributes["user.id"], "[ID]") where attributes["user.id"] != nil
+
+exporters:
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+
+  debug:
+    verbosity: detailed
+
+  otlp:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+extensions:
+  health_check:
+  pprof:
+  zpages:
+
+service:
+  extensions: [health_check, pprof, zpages]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, transform, batch]
+      exporters: [otlp]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]
