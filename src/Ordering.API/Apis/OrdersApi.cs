@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using CardType = eShop.Ordering.API.Application.Queries.CardType;
 using Order = eShop.Ordering.API.Application.Queries.Order;
-using eShop.Ordering.API.OpenTelemetry;
+// using eShop.Ordering.API.OpenTelemetry;
 using System.Diagnostics.Metrics;
 public static class OrdersApi
 {

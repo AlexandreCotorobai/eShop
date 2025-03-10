@@ -25,6 +25,7 @@ var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOI
 var meter = new Meter("Ordering.API");
 builder.Services.AddSingleton(meter);
 builder.Services.AddSingleton(meter.CreateCounter<long>("order_placed_count", description: "Número total de orders."));
+builder.Services.AddSingleton(meter.CreateHistogram<double>("total_purchase_amount", unit: "USD", description: "Soma total das compras feitas."));
 
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracerProviderBuilder =>
