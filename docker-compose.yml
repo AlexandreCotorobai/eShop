@@ -29,7 +29,8 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
-      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
 
   jaeger:
     image: jaegertracing/jaeger:2.3.0
@@ -40,5 +41,6 @@ services:
     environment:
       - COLLECTOR_ZIPKIN_HTTP_PORT=9411  # Enable Zipkin format support
       - LOG_LEVEL=debug
+
 volumes:
   grafana-storage:

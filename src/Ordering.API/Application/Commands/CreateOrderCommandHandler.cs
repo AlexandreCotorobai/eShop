@@ -16,6 +16,7 @@ public class CreateOrderCommandHandler
     private readonly ILogger<CreateOrderCommandHandler> _logger;
     private readonly Counter<long> _orderPlacedCounter;
     private readonly Histogram<double> _totalPurchaseAmountHistogram;
+    private readonly UpDownCounter<int> _activeOrdersGauge;
 
     // Using DI to inject infrastructure persistence Repositories
     public CreateOrderCommandHandler(IMediator mediator,
@@ -24,7 +25,8 @@ public class CreateOrderCommandHandler
         IIdentityService identityService,
         ILogger<CreateOrderCommandHandler> logger,
         Counter<long> orderPlacedCounter,
-        Histogram<double> totalPurchaseAmountHistogram)
+        Histogram<double> totalPurchaseAmountHistogram,
+        UpDownCounter<int> activeOrdersGauge)
     {
         _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
         _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
@@ -33,6 +35,7 @@ public class CreateOrderCommandHandler
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _orderPlacedCounter = orderPlacedCounter ?? throw new ArgumentNullException(nameof(orderPlacedCounter));
         _totalPurchaseAmountHistogram = totalPurchaseAmountHistogram ?? throw new ArgumentNullException(nameof(totalPurchaseAmountHistogram)); // Assign histogram
+        _activeOrdersGauge = activeOrdersGauge ?? throw new ArgumentNullException(nameof(activeOrdersGauge));
 
     }
 
@@ -62,6 +65,9 @@ public class CreateOrderCommandHandler
         
         _orderPlacedCounter.Add(1, new KeyValuePair<string, object>("userId", message.UserId));
         _logger.LogInformation("Order Placed Counter Incremented");
+
+        _activeOrdersGauge.Add(1, new KeyValuePair<string, object>("userId", message.UserId));
+        _logger.LogInformation("Active Orders Gauge Incremented");
         
         _totalPurchaseAmountHistogram.Record(totalAmount, new KeyValuePair<string, object>("userId", message.UserId));
         _logger.LogInformation("Total Purchase Amount Recorded: {TotalAmount}", totalAmount);

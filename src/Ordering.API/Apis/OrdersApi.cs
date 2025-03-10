@@ -8,7 +8,6 @@ public static class OrdersApi
 {
     // Create a dedicated ActivitySource and Meter for this class
     private static readonly ActivitySource ActivitySource = new("eShop.Ordering", "1.0.0");
-    private static readonly Meter Meter = new("eShop.Ordering", "1.0.0");
     
     // Helpers to mask sensitive data
     private static string MaskUserId(string userId)
