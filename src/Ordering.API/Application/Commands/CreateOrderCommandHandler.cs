@@ -17,6 +17,10 @@ public class CreateOrderCommandHandler
     private readonly Counter<long> _orderPlacedCounter;
     private readonly Histogram<double> _totalPurchaseAmountHistogram;
     private readonly UpDownCounter<int> _activeOrdersGauge;
+    private readonly Histogram<double> _orderValueHistogram;
+    private readonly Counter<double> _totalRevenueCounter;
+    private readonly Counter<int> _orderItemQuantityCounter;
+    private readonly Counter<int> _OrdersByUserCounter;
 
     // Using DI to inject infrastructure persistence Repositories
     public CreateOrderCommandHandler(IMediator mediator,
@@ -26,7 +30,11 @@ public class CreateOrderCommandHandler
         ILogger<CreateOrderCommandHandler> logger,
         Counter<long> orderPlacedCounter,
         Histogram<double> totalPurchaseAmountHistogram,
-        UpDownCounter<int> activeOrdersGauge)
+        UpDownCounter<int> activeOrdersGauge,
+        Histogram<double> orderValueHistogram,
+        Counter<double> totalRevenueCounter,
+        Counter<int> orderItemQuantityCounter,
+        Counter<int> OrdersByUserCounter)
     {
         _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
         _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
@@ -36,7 +44,10 @@ public class CreateOrderCommandHandler
         _orderPlacedCounter = orderPlacedCounter ?? throw new ArgumentNullException(nameof(orderPlacedCounter));
         _totalPurchaseAmountHistogram = totalPurchaseAmountHistogram ?? throw new ArgumentNullException(nameof(totalPurchaseAmountHistogram)); // Assign histogram
         _activeOrdersGauge = activeOrdersGauge ?? throw new ArgumentNullException(nameof(activeOrdersGauge));
-
+        _orderValueHistogram = orderValueHistogram ?? throw new ArgumentNullException(nameof(orderValueHistogram));
+        _totalRevenueCounter = totalRevenueCounter ?? throw new ArgumentNullException(nameof(totalRevenueCounter));
+        _orderItemQuantityCounter = orderItemQuantityCounter ?? throw new ArgumentNullException(nameof(orderItemQuantityCounter));
+        _OrdersByUserCounter = OrdersByUserCounter ?? throw new ArgumentNullException(nameof(OrdersByUserCounter));
     }
 
     public async Task<bool> Handle(CreateOrderCommand message, CancellationToken cancellationToken)
@@ -53,21 +64,23 @@ public class CreateOrderCommandHandler
         var order = new Order(message.UserId, message.UserName, address, message.CardTypeId, message.CardNumber, message.CardSecurityNumber, message.CardHolderName, message.CardExpiration);
 
         double totalAmount = 0;
+        int itemCount = 0;
 
         foreach (var item in message.OrderItems)
         {
             order.AddOrderItem(item.ProductId, item.ProductName, item.UnitPrice, item.Discount, item.PictureUrl, item.Units);
             totalAmount += (double)(item.UnitPrice - item.Discount) * item.Units;
-
+            itemCount += item.Units;
         }
 
         _logger.LogInformation("Creating Order - Order: {@Order}", order);
         
         _orderPlacedCounter.Add(1, new KeyValuePair<string, object>("userId", message.UserId));
-        _logger.LogInformation("Order Placed Counter Incremented");
-
-        _activeOrdersGauge.Add(1, new KeyValuePair<string, object>("userId", message.UserId));
-        _logger.LogInformation("Active Orders Gauge Incremented");
+        _activeOrdersGauge.Add(1);
+        _orderValueHistogram.Record(totalAmount, new KeyValuePair<string, object>("orderNumber", order.Id.ToString()));
+        _totalRevenueCounter.Add((long)totalAmount, new KeyValuePair<string, object>("userId", message.UserId));
+        _orderItemQuantityCounter.Add(itemCount);
+        _OrdersByUserCounter.Add(1, new KeyValuePair<string, object>("userId", message.UserId));
         
         _totalPurchaseAmountHistogram.Record(totalAmount, new KeyValuePair<string, object>("userId", message.UserId));
         _logger.LogInformation("Total Purchase Amount Recorded: {TotalAmount}", totalAmount);
