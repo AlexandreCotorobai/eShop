@@ -71,16 +71,17 @@ public class CreateOrderCommandHandler
             order.AddOrderItem(item.ProductId, item.ProductName, item.UnitPrice, item.Discount, item.PictureUrl, item.Units);
             totalAmount += (double)(item.UnitPrice - item.Discount) * item.Units;
             itemCount += item.Units;
+            _orderItemQuantityCounter.Add(item.Units, new KeyValuePair<string, object>("itemName", item.ProductName));
+
         }
 
         _logger.LogInformation("Creating Order - Order: {@Order}", order);
         
         _orderPlacedCounter.Add(1, new KeyValuePair<string, object>("userId", message.UserId));
         _activeOrdersGauge.Add(1);
-        _orderValueHistogram.Record(totalAmount, new KeyValuePair<string, object>("orderNumber", order.Id.ToString()));
+        _orderValueHistogram.Record(totalAmount, new KeyValuePair<string, object>("userId", message.UserId));
         _totalRevenueCounter.Add((long)totalAmount, new KeyValuePair<string, object>("userId", message.UserId));
-        _orderItemQuantityCounter.Add(itemCount);
-        _OrdersByUserCounter.Add(1, new KeyValuePair<string, object>("userId", message.UserId));
+        _OrdersByUserCounter.Add(1, new KeyValuePair<string, object>("userName", message.UserName));
         
         _totalPurchaseAmountHistogram.Record(totalAmount, new KeyValuePair<string, object>("userId", message.UserId));
         _logger.LogInformation("Total Purchase Amount Recorded: {TotalAmount}", totalAmount);

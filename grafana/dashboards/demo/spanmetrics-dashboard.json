@@ -24,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 5,
+  "id": 2,
   "links": [],
   "liveNow": true,
   "panels": [
@@ -400,7 +400,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Distribution of order values",
+      "description": "Top 5 Order Value per User",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -460,14 +460,16 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (le) (rate(mk_order_value_USD_bucket[24h]))",
-          "format": "heatmap",
+          "exemplar": false,
+          "expr": "topk(5, sum by (userId) (mk_order_value_USD_sum/2))",
+          "format": "time_series",
+          "instant": false,
           "legendFormat": "{{le}} USD",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Order Value Distribution",
+      "title": "Top 5 Order Value per User",
       "type": "piechart"
     },
     {
@@ -560,7 +562,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(mk_order_value_USD_sum[1h]) / rate(mk_order_value_USD_count[1h])",
+          "expr": "(sum(mk_order_value_USD_sum) / sum(mk_order_placed_count_total)) / 2\n",
           "legendFormat": "Average Order Value",
           "range": true,
           "refId": "A"
@@ -659,110 +661,15 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "topk(10, mk_orders_by_user_total)",
+          "expr": "topk(10, mk_orders_by_user_total{userName!=\"\"})",
           "instant": true,
-          "legendFormat": "User {{user_id}}",
+          "legendFormat": "{{userName}}",
           "range": false,
           "refId": "A"
         }
       ],
       "title": "Top 10 Users by Order Count",
       "type": "bargauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "description": "Order rate by user",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "orders"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 23
-      },
-      "id": 12,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "topk(5, rate(mk_orders_by_user_total[1h]))",
-          "legendFormat": "User {{user_id}}",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Top 5 Users Order Rate",
-      "type": "timeseries"
     },
     {
       "collapsed": false,
@@ -834,7 +741,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "mk_order_value_USD_sum / mk_order_value_USD_count",
+          "expr": "sum(mk_revenue_USD_total) / sum(mk_order_placed_count_total)",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -900,7 +807,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "mk_revenue_USD_total / count(mk_orders_by_user_total)",
+          "expr": "sum(mk_revenue_USD_total) / count(mk_order_placed_count_total)\n\n",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -908,104 +815,6 @@
       ],
       "title": "Revenue per User",
       "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "description": "Revenue per hour",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "bars",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "currencyUSD"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 12,
-        "x": 12,
-        "y": 32
-      },
-      "id": 16,
-      "options": {
-        "legend": {
-          "calcs": [
-            "sum"
-          ],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "11.5.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "increase(mk_revenue_USD_total[1h])",
-          "interval": "1h",
-          "legendFormat": "Hourly Revenue",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Hourly Revenue",
-      "type": "timeseries"
     },
     {
       "datasource": {
@@ -1096,26 +905,117 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "increase(mk_revenue_USD_total[1d])",
+          "expr": "sum(rate(active_orders[5m]))\n",
           "interval": "1d",
-          "legendFormat": "Daily Revenue",
+          "legendFormat": "__auto",
           "range": true,
           "refId": "A"
+        }
+      ],
+      "title": "Revenue Trends",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Orders yet to be processed",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 46
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.5.2",
+      "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
           },
+          "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "increase(mk_revenue_USD_total[7d]) / 7",
-          "interval": "1d",
-          "legendFormat": "Weekly Average (per day)",
+          "expr": "sum(active_orders)",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
           "range": true,
-          "refId": "B"
+          "refId": "A",
+          "useBackend": false
         }
       ],
-      "title": "Revenue Trends",
+      "title": "Active Orders",
       "type": "timeseries"
     }
   ],
