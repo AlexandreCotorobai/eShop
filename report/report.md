@@ -19,7 +19,7 @@ The implementation focused on the Order creation and processing flow, which invo
 
 The following components were implemented to enable comprehensive tracing and monitoring:
 
-#### 2.2.1. Tracing Infrastructure
+#### 2.2.1. Tracing and Metrics Infrastructure
 
 ```csharp
 // From Program.cs
@@ -37,6 +37,18 @@ builder.Services.AddOpenTelemetry()
                 options.AgentPort = jaegerPort;
             });
     })
+    .WithMetrics(metrics =>
+    {
+        metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddMeter("Ordering.API")
+            .AddOtlpExporter(options =>
+            {
+                options.Endpoint = new Uri(opentelemetryCollectorUrl);
+            });
+    });
+
 ```
 
 A dedicated `ActivitySource` was created for the Ordering service to enable custom spans:
