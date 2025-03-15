@@ -25,7 +25,7 @@ var identityApi = builder.AddProject<Projects.Identity_API>("identity-api", laun
     .WithReference(identityDb)
     .WaitFor(postgres)
     .WithEnvironment("ConnectionString", 
-        "Host=postgres;Database=identitydb;Username=identity_user;Password=Identity_Pass123;");
+        "Host=postgres;Database=identitydb;Username=identity_user;Password=pass_identity;");
 var identityEndpoint = identityApi.GetEndpoint(launchProfileName);
 
 var basketApi = builder.AddProject<Projects.Basket_API>("basket-api")
@@ -39,7 +39,7 @@ var catalogApi = builder.AddProject<Projects.Catalog_API>("catalog-api")
     .WithReference(catalogDb)
     .WaitFor(postgres)
     .WithEnvironment("ConnectionString", 
-        "Host=postgres;Database=catalogdb;Username=catalog_user;Password=Catalog_Pass123;");
+        "Host=postgres;Database=catalogdb;Username=catalog_user;Password=pass_catalog;");
 var orderingApi = builder.AddProject<Projects.Ordering_API>("ordering-api")
     .WithReference(rabbitMq).WaitFor(rabbitMq)
     .WaitFor(postgres)
@@ -47,14 +47,14 @@ var orderingApi = builder.AddProject<Projects.Ordering_API>("ordering-api")
     .WithHttpHealthCheck("/health")
     .WithEnvironment("Identity__Url", identityEndpoint)
     .WithEnvironment("ConnectionString", 
-        "Host=postgres;Database=orderingdb;Username=ordering_user;Password=Ordering_Pass123;");
+        "Host=postgres;Database=orderingdb;Username=ordering_user;Password=pass_ordering;");
 
 builder.AddProject<Projects.OrderProcessor>("order-processor")
     .WithReference(rabbitMq).WaitFor(rabbitMq)
     .WaitFor(postgres)
     .WithReference(orderDb)
     .WithEnvironment("ConnectionString", 
-        "Host=postgres;Database=orderingdb;Username=ordering_user;Password=Ordering_Pass123;")
+        "Host=postgres;Database=orderingdb;Username=ordering_user;Password=pass_ordering;")
     .WaitFor(orderingApi); // wait for the orderingApi to be ready because that contains the EF migrations
 
 builder.AddProject<Projects.PaymentProcessor>("payment-processor")
@@ -66,7 +66,7 @@ var webHooksApi = builder.AddProject<Projects.Webhooks_API>("webhooks-api")
     .WithReference(webhooksDb)
     .WithEnvironment("Identity__Url", identityEndpoint)
     .WithEnvironment("ConnectionString", 
-        "Host=postgres;Database=webhooksdb;Username=webhooks_user;Password=Webhooks_Pass123;");
+        "Host=postgres;Database=webhooksdb;Username=webhooks_user;Password=pass_webhooks;");
 builder.AddProject<Projects.Mobile_Bff_Shopping>("mobile-bff")
     .WithReference(catalogApi)
     .WithReference(orderingApi)

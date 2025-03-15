@@ -1,16 +1,13 @@
--- Create roles for different services
-CREATE ROLE catalog_user WITH LOGIN PASSWORD 'Catalog_Pass123';
-CREATE ROLE identity_user WITH LOGIN PASSWORD 'Identity_Pass123';
-CREATE ROLE ordering_user WITH LOGIN PASSWORD 'Ordering_Pass123';
-CREATE ROLE webhooks_user WITH LOGIN PASSWORD 'Webhooks_Pass123';
+CREATE ROLE catalog_user WITH LOGIN PASSWORD 'pass_catalog';
+CREATE ROLE identity_user WITH LOGIN PASSWORD 'pass_identity';
+CREATE ROLE ordering_user WITH LOGIN PASSWORD 'pass_ordering';
+CREATE ROLE webhooks_user WITH LOGIN PASSWORD 'pass_webhooks';
 
--- Create databases if they don't exist
 CREATE DATABASE catalogdb;
 CREATE DATABASE identitydb;
 CREATE DATABASE orderingdb;
 CREATE DATABASE webhooksdb;
 
--- Connect to each database and set up permissions
 \c catalogdb
 GRANT ALL PRIVILEGES ON DATABASE catalogdb TO catalog_user;
 GRANT ALL PRIVILEGES ON SCHEMA public TO catalog_user;
