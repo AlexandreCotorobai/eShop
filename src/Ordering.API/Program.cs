@@ -24,14 +24,15 @@ var otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOI
 
 var meter = new Meter("Ordering.API");
 builder.Services.AddSingleton(meter);
+builder.Services.AddSingleton(meter.CreateCounter<long>("mk_order_placed_count", description: "Número total de orders."));
+builder.Services.AddSingleton(meter.CreateGauge<int>("mk_active_orders", description: "Número de orders ativas."));
+builder.Services.AddSingleton(meter.CreateHistogram<double>("mk_total_purchase_amount", unit: "USD", description: "Soma total das compras feitas."));
+builder.Services.AddSingleton(meter.CreateHistogram<double>("mk_order_value", unit: "USD", description: "Valor de uma order."));
+builder.Services.AddSingleton(meter.CreateCounter<double>("mk_total_revenue", unit: "USD", description: "Receita total."));
+builder.Services.AddSingleton(meter.CreateCounter<int>("mk_order_item_quantity", description: "Quantidade de items em uma order."));
+builder.Services.AddSingleton(meter.CreateCounter<int>("mk_orders_by_user", description: "Número de orders por usuário."));
 
-builder.Services.AddSingleton(meter.CreateCounter<long>("order_placed_count", description: "Total number of orders placed"));
 builder.Services.AddSingleton(meter.CreateUpDownCounter<int>("active_orders", description: "Number of currently active orders"));
-builder.Services.AddSingleton(meter.CreateHistogram<double>("total_purchase_amount", unit: "USD", description: "Total amount of purchases"));
-builder.Services.AddSingleton(meter.CreateHistogram<double>("order_value", unit: "USD", description: "Value of an order"));
-builder.Services.AddSingleton(meter.CreateCounter<double>("total_revenue", unit: "USD", description: "Total revenue"));
-builder.Services.AddSingleton(meter.CreateCounter<int>("order_item_quantity", description: "Quantity of items in an order"));
-builder.Services.AddSingleton(meter.CreateCounter<int>("orders_by_user", description: "Number of orders by user"));
 
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracerProviderBuilder =>
@@ -56,7 +57,7 @@ builder.Services.AddOpenTelemetry()
             .AddOtlpExporter(options =>
             {
                 options.Endpoint = new Uri("http://localhost:4317");
-            }).AddPrometheusExporter();
+            });
     });
 
 var app = builder.Build();

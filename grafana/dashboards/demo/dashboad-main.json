@@ -98,7 +98,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(order_placed_count_total)",
+          "expr": "sum(mk_order_placed_count_total)",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -196,7 +196,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(order_placed_count_total[5m])) * 60",
+          "expr": "sum(rate(mk_order_placed_count_total[5m])) * 60",
           "legendFormat": "Orders per minute",
           "range": true,
           "refId": "A"
@@ -275,7 +275,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(revenue_USD_total)",
+          "expr": "sum(mk_revenue_USD_total)",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -373,7 +373,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(revenue_USD_total)",
+          "expr": "sum(mk_revenue_USD_total)",
           "legendFormat": "Revenue Rate",
           "range": true,
           "refId": "A"
@@ -461,7 +461,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "topk(5, sum by (userId) (order_value_USD_sum/2))",
+          "expr": "topk(5, sum by (userId) (mk_order_value_USD_sum/2))",
           "format": "time_series",
           "instant": false,
           "legendFormat": "{{le}} USD",
@@ -562,7 +562,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "(sum(order_value_USD_sum) / sum(order_placed_count_total)) / 2\n",
+          "expr": "(sum(mk_order_value_USD_sum) / sum(mk_order_placed_count_total)) / 2\n",
           "legendFormat": "Average Order Value",
           "range": true,
           "refId": "A"
@@ -661,7 +661,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "topk(10, orders_by_user_total{userName!=\"\"})",
+          "expr": "topk(10, mk_orders_by_user_total{userName!=\"\"})",
           "instant": true,
           "legendFormat": "{{userName}}",
           "range": false,
@@ -741,7 +741,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(revenue_USD_total) / sum(order_placed_count_total)",
+          "expr": "sum(mk_revenue_USD_total) / sum(mk_order_placed_count_total)",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -807,7 +807,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(revenue_USD_total) / count(order_placed_count_total)\n\n",
+          "expr": "sum(mk_revenue_USD_total) / count(mk_order_placed_count_total)\n\n",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -987,10 +987,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "editorMode": "code",
-          "expr": "rate(order_placed_count_total[5m])",
+          "expr": "rate(mk_order_placed_count_total[5m])",
           "legendFormat": "Orders Rate",
-          "range": true,
           "refId": "A"
         },
         {
