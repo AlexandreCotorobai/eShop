@@ -1,20 +1,13 @@
 #!/bin/bash
 
-# Simple load test script for eShop Order API
-# This script sends multiple order creation requests
-
-# Base URL of the API
 API_URL="http://localhost:5224"
 
-# Number of requests to send
 NUM_REQUESTS=25
 
-# Delay between requests in seconds
 DELAY=5
 
-# Function to send order request
 send_order_request() {
-    request_id=$(uuidgen)  # Generate a unique request ID
+    request_id=$(uuidgen)
     echo "Sending order request with ID: $request_id"
     
     random_user_id="test-user-$((RANDOM % 9000 + 1000))"
@@ -48,7 +41,6 @@ send_order_request() {
 EOF
 )
 
-    # Send POST request
     response=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$API_URL/api/orders?api-version=1.0" \
         -H "Content-Type: application/json" \
         -H "x-requestid: $request_id" \
@@ -60,13 +52,11 @@ EOF
         echo -e "\e[31mRequest failed (HTTP $response)\e[0m"
     fi
     
-    sleep $DELAY  # Wait for defined delay between requests
+    sleep $DELAY
 }
 
-# Start load test
 echo "Starting load test - sending $NUM_REQUESTS requests..."
 
-# Loop to send multiple requests
 for ((i=1; i<=NUM_REQUESTS; i++)); do
     echo "Request $i of $NUM_REQUESTS"
     send_order_request

@@ -133,7 +133,6 @@ public static class OrdersApi
         [AsParameters] OrderServices services)
     {
         
-        //mask the credit card number
         
         services.Logger.LogInformation(
             "Sending command: {CommandName} - {IdProperty}: {CommandId}",
