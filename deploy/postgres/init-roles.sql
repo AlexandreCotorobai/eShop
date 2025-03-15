@@ -1,0 +1,40 @@
+-- Create roles for different services
+CREATE ROLE catalog_user WITH LOGIN PASSWORD 'Catalog_Pass123';
+CREATE ROLE identity_user WITH LOGIN PASSWORD 'Identity_Pass123';
+CREATE ROLE ordering_user WITH LOGIN PASSWORD 'Ordering_Pass123';
+CREATE ROLE webhooks_user WITH LOGIN PASSWORD 'Webhooks_Pass123';
+
+-- Create databases if they don't exist
+CREATE DATABASE catalogdb;
+CREATE DATABASE identitydb;
+CREATE DATABASE orderingdb;
+CREATE DATABASE webhooksdb;
+
+-- Connect to each database and set up permissions
+\c catalogdb
+GRANT ALL PRIVILEGES ON DATABASE catalogdb TO catalog_user;
+GRANT ALL PRIVILEGES ON SCHEMA public TO catalog_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO catalog_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO catalog_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO catalog_user;
+
+\c identitydb
+GRANT ALL PRIVILEGES ON DATABASE identitydb TO identity_user;
+GRANT ALL PRIVILEGES ON SCHEMA public TO identity_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO identity_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO identity_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO identity_user;
+
+\c orderingdb
+GRANT ALL PRIVILEGES ON DATABASE orderingdb TO ordering_user;
+GRANT ALL PRIVILEGES ON SCHEMA public TO ordering_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO ordering_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO ordering_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO ordering_user;
+
+\c webhooksdb
+GRANT ALL PRIVILEGES ON DATABASE webhooksdb TO webhooks_user;
+GRANT ALL PRIVILEGES ON SCHEMA public TO webhooks_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO webhooks_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO webhooks_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO webhooks_user;
