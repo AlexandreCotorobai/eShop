@@ -8,43 +8,6 @@ public static class OrdersApi
 {
     // Create a dedicated ActivitySource and Meter for this class
     private static readonly ActivitySource ActivitySource = new("eShop.Ordering", "1.0.0");
-    
-    // Helpers to mask sensitive data
-    private static string MaskUserId(string userId)
-    {
-        if (string.IsNullOrEmpty(userId))
-            return userId;
-
-        // If it's a UUID/GUID format, keep first and last components
-        if (Guid.TryParse(userId, out _))
-        {
-            var parts = userId.Split('-');
-            if (parts.Length >= 5)
-            {
-                return $"{parts[0]}-****-****-****-{parts[4]}";
-            }
-        }
-
-        // If it's an email, mask the local part except first character
-        if (userId.Contains('@'))
-        {
-            var parts = userId.Split('@');
-            if (parts.Length == 2 && !string.IsNullOrEmpty(parts[0]))
-            {
-                return $"{parts[0][0]}***@{parts[1]}";
-            }
-        }
-
-        // For other formats, mask the middle portion
-        if (userId.Length > 6)
-        {
-            int visibleChars = Math.Max(2, userId.Length / 4);
-            return $"{userId.Substring(0, visibleChars)}****{userId.Substring(userId.Length - visibleChars)}";
-        }
-
-        // For short IDs, just return a generic mask
-        return "****";
-    }
 
     public static RouteGroupBuilder MapOrdersApiV1(this IEndpointRouteBuilder app)
     {
