@@ -428,3 +428,19 @@ To enhance the current implementation, the following improvements could be consi
 ### 6.3. Conclusion
 
 This project enabled me to gain hands-on experience observability tools and security practices, which are essential for building secure and reliable software systems.
+The most difficult part of the project was to understand this new environment, with new tools and technologies, but after understanding the basics (which took some time), the implementation was very smooth.
+
+## Links
+
+Github Repository: https://github.com/AlexandreCotorobai/eShop
+ - docker-compose.yml, otel-collector-config.yaml, prometheus.yml are inside the root folder
+ - Loadtests are inside the loadtests folder
+ - Database scripts are inside the deploy folder
+ - Grafana dashboards are inside the grafana folder
+ - Report and diagrams are inside the report folder
+
+## How to run
+- ``docker compose up --build`` inside the root folder
+- ``dotnet run --project src/eShop.AppHost/eShop.AppHost.cspro`` inside the root folder
+- ``chmod +x ./loadtests/order-load-test.sh``
+- ``./loadtests/order-load-test.sh``
