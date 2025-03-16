@@ -439,7 +439,26 @@ To enhance the current implementation, the following improvements could be consi
 3. **Role-based Data Masking**: Implement dynamic data masking based on user roles
 4. **Alerting**: Configure alerts based on metrics thresholds
 
-### 6.3. Conclusion
+### 6.3. Gen AI Tools Used
+During the implementation, I used GitHub Copilot and ChatGPT to enhance productivity:
+
+- GitHub Copilot:
+
+  - Assisted with code completion and syntax suggestions.
+
+  - Helped generate OpenTelemetry instrumentation, Prometheus metrics, and SQL scripts, for example.
+
+  - Automated repetitive coding tasks.
+
+- ChatGPT:
+
+  - Helped in debugging errors.
+
+  - Assisted in troubleshooting Docker and general service configurations.
+
+These AI tools significantly reduced development time and improved the implementation quality.
+
+### 6.4. Conclusion
 
 This project enabled me to gain hands-on experience observability tools and security practices, which are essential for building secure and reliable software systems.
 The most difficult part of the project was to understand this new environment, with new tools and technologies, but after understanding the basics (which took some time), the implementation was very smooth.
