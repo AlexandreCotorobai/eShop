@@ -89,7 +89,7 @@ public class CreateOrderCommandHandler
 
         _logger.LogInformation("Creating Order - Order: {@Order}", order);
         
-        _orderPlacedCounter.Add(1, new KeyValuePair<string, object>("userId", message.UserId));
+        _orderPlacedCounter.Add(1, new KeyValuePair<string, object>("userId", MaskString(message.UserId)));
         _activeOrdersGauge.Add(1);
         _orderValueHistogram.Record(totalAmount, new KeyValuePair<string, object>("userId", MaskString(message.UserId)));
         _totalRevenueCounter.Add((long)totalAmount, new KeyValuePair<string, object>("userId",  MaskString(message.UserId)));
