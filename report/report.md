@@ -6,9 +6,11 @@ This report documents the implementation of OpenTelemetry tracing and security f
 
 ## 2. Implementation Overview
 
-### 2.1. Feature Selection: Order Processing Flow
+![Architecture](diagrams/architecture.png)
 
-The implementation focused on the Order creation and processing flow, which involves multiple microservices and represents a critical business operation. This feature was selected because:
+### 2.1. Feature Selection: Order Processing Flow
+![Order Flow](diagrams/sequence.png)
+The implementation focused on the Order creation and processing flow, which impacts multiple microservices and represents a critical business operation. This feature was selected because:
 
 - It processes sensitive customer data (credit card information, personal details)
 - It spans multiple services (BasketAPI, OrderingAPI...)
@@ -456,3 +458,7 @@ Github Repository: https://github.com/AlexandreCotorobai/eShop
 - ``dotnet run --project src/eShop.AppHost/eShop.AppHost.cspro`` inside the root folder
 - ``chmod +x ./loadtests/order-load-test.sh``
 - ``./loadtests/order-load-test.sh``
+
+- Grafana is available at http://localhost:3000
+- Prometheus is available at http://localhost:9090
+- Jaeger is available at http://localhost:16686
